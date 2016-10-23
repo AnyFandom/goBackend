@@ -8,3 +8,7 @@ func HashPassword(password string) []byte {
 	var encr = h.Sum(nil)
 	return encr
 }
+
+type Location struct {
+	Location string
+}

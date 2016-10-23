@@ -4,7 +4,7 @@ import "github.com/revel/revel"
 
 func init() {
 	revel.OnAppStart(InitDB) // invoke InitDB function before
-	revel.InterceptMethod((*GormController).Begin, revel.BEFORE)
-	revel.InterceptMethod((*GormController).Commit, revel.AFTER)
-	revel.InterceptMethod((*GormController).Rollback, revel.FINALLY)
+	revel.InterceptMethod((*BaseController).Begin, revel.BEFORE)
+	revel.InterceptMethod((*BaseController).Commit, revel.AFTER)
+	revel.InterceptMethod((*BaseController).Rollback, revel.FINALLY)
 }

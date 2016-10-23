@@ -11,11 +11,7 @@ import (
 // TODO: Add jsend
 
 type Users struct {
-	GormController
-}
-
-type Location struct {
-	Location string
+	BaseController
 }
 
 func (c Users) List() revel.Result {
@@ -27,13 +23,13 @@ func (c Users) List() revel.Result {
 func (c Users) Item(id int64) revel.Result {
 	var user models.User
 	c.Txn.First(&user, id)
-	return c.RenderJson(user)
+	return c.RenderJsend("success", user)
 }
 
 func (c Users) Add(username string, password string) revel.Result {
 	var user = models.User{Name: username, Password: utils.HashPassword(password)}
 	c.Txn.NewRecord(user)
 	c.Txn.Create(&user)
-	var location = Location{Location: routes.Users.Item(int64(user.ID))}
-	return c.RenderJson(location)
+	var location = utils.Location{Location: routes.Users.Item(int64(user.ID))}
+	return c.RenderJsend("success", location)
 }

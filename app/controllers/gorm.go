@@ -12,9 +12,20 @@ import (
 
 // type: revel controller with `*gorm.DB`
 // c.Txn will keep `Gdb *gorm.DB`
-type GormController struct {
+type BaseController struct {
 	*r.Controller
 	Txn *gorm.DB
+}
+
+type Jsend struct {
+	Status  string      `json:"status"`
+	Data    interface{} `json:"data"`
+	Message string      `json:"message"`
+}
+
+func (c BaseController) RenderJsend(s string, d interface{}) r.Result {
+	jsend := Jsend{Status: s, Data: d}
+	return c.RenderJson(jsend)
 }
 
 // it can be used for jobs
@@ -37,7 +48,7 @@ func InitDB() {
 // transactions
 
 // This method fills the c.Txn before each transaction
-func (c *GormController) Begin() r.Result {
+func (c *BaseController) Begin() r.Result {
 	txn := Gdb.Begin()
 	if txn.Error != nil {
 		panic(txn.Error)
@@ -47,7 +58,7 @@ func (c *GormController) Begin() r.Result {
 }
 
 // This method clears the c.Txn after each transaction
-func (c *GormController) Commit() r.Result {
+func (c *BaseController) Commit() r.Result {
 	if c.Txn == nil {
 		return nil
 	}
@@ -60,7 +71,7 @@ func (c *GormController) Commit() r.Result {
 }
 
 // This method clears the c.Txn after each transaction, too
-func (c *GormController) Rollback() r.Result {
+func (c *BaseController) Rollback() r.Result {
 	if c.Txn == nil {
 		return nil
 	}
