@@ -1,6 +1,11 @@
 package utils
 
-import "crypto/sha256"
+import (
+	"crypto/sha256"
+	"fmt"
+
+	jwt "github.com/dgrijalva/jwt-go"
+)
 
 func HashPassword(password string) []byte {
 	var h = sha256.New()
@@ -11,4 +16,35 @@ func HashPassword(password string) []byte {
 
 type Location struct {
 	Location string
+}
+
+func CreateToken(id uint) string {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"id": id})
+
+	tokenString, err := token.SignedString([]byte("test-key"))
+	if err != nil {
+		panic(err)
+	}
+	return tokenString
+}
+
+func ParseToken(tokenString string) jwt.MapClaims {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte("test-key"), nil
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	fmt.Print(claims)
+	if !ok && !token.Valid {
+		panic(err)
+	}
+	return claims
 }

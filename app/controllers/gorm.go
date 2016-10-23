@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"reflect"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	// short name for revel
@@ -8,13 +10,16 @@ import (
 	// YOUR APP NAME
 	"database/sql"
 	"goBackend/app/models"
+	"goBackend/app/utils"
 )
 
 // type: revel controller with `*gorm.DB`
 // c.Db will keep `Gdb *gorm.DB`
 type BaseController struct {
 	*r.Controller
-	Db *gorm.DB
+	Db         *gorm.DB
+	authorized bool
+	userId     uint
 }
 
 type Jsend struct {
@@ -26,6 +31,28 @@ type Jsend struct {
 func (c BaseController) RenderJsend(s string, d interface{}) r.Result {
 	jsend := Jsend{Status: s, Data: d}
 	return c.RenderJson(jsend)
+}
+
+func (c *BaseController) CheckToken() r.Result {
+	var token string
+	c.Params.Bind(&token, "token")
+
+	if len(token) == 0 {
+		return nil
+	}
+
+	claims := utils.ParseToken(token)
+
+	userId, ok := claims["id"].(float64)
+
+	if !ok {
+		panic(reflect.TypeOf(claims["id"]))
+	}
+
+	c.userId = uint(userId)
+	c.authorized = true
+
+	return nil
 }
 
 // it can be used for jobs

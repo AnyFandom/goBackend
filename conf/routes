@@ -16,5 +16,8 @@ GET     /users                                  Users.List
 GET     /users/add                              Users.Add
 GET     /users/:id                              Users.Item
 
+GET     /token                                  Token.Create
+GET     /token/test                             Token.Test
+
 # Catch all
 *       /:controller/:action                    :controller.:action
