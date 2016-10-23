@@ -1,13 +1,15 @@
 package models
 
-import  "time" // if you need/want
+import "time"
 
-type User struct {          // example user fields
-    Id                    int64
-    Name                  string
-    EcncryptedPassword    []byte
-    Password              string      `sql:"-"`
-    CreatedAt             time.Time
-    UpdatedAt             time.Time
-    DeletedAt             time.Time     // for soft delete
+type Base struct {
+	ID        uint `gorm:"primary_key"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+type User struct { // example user fields
+	Name     string
+	Password []byte
+	Base
 }
