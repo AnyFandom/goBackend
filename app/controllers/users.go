@@ -15,19 +15,31 @@ type Users struct {
 func (c Users) List() revel.Result {
 	var users []models.User
 	c.Db.Find(&users)
-	return c.RenderJsend("success", users)
+	return c.RenderJsend("success", users, "")
 }
 
 func (c Users) Item(id uint) revel.Result {
 	var user models.User
 	c.Db.First(&user, id)
-	return c.RenderJsend("success", user)
+	return c.RenderJsend("success", user, "")
 }
 
 func (c Users) Add(username string, password string) revel.Result {
+	c.Validation.Required(username)
+	c.Validation.MaxSize(username, 15)
+	c.Validation.MinSize(username, 2)
+
+	c.Validation.Required(password)
+	c.Validation.MaxSize(password, 200)
+	c.Validation.MinSize(password, 6)
+
+	if c.Validation.HasErrors() {
+		return c.RenderJsend("fail", nil, "Validation error")
+	}
+
 	var user = models.User{Name: username, Password: utils.HashPassword(password)}
 	c.Db.NewRecord(user)
 	c.Db.Create(&user)
 	var location = utils.Location{Location: routes.Users.Item(user.ID)}
-	return c.RenderJsend("success", location)
+	return c.RenderJsend("success", location, "")
 }

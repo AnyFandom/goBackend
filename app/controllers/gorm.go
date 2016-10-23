@@ -28,8 +28,8 @@ type Jsend struct {
 	Message string      `json:"message"`
 }
 
-func (c BaseController) RenderJsend(s string, d interface{}) r.Result {
-	jsend := Jsend{Status: s, Data: d}
+func (c BaseController) RenderJsend(s string, d interface{}, m string) r.Result {
+	jsend := Jsend{Status: s, Data: d, Message: m}
 	return c.RenderJson(jsend)
 }
 
@@ -43,13 +43,21 @@ func (c *BaseController) CheckToken() r.Result {
 
 	claims := utils.ParseToken(token)
 
-	userId, ok := claims["id"].(float64)
+	floatUserId, ok := claims["id"].(float64)
 
 	if !ok {
 		panic(reflect.TypeOf(claims["id"]))
 	}
 
-	c.userId = uint(userId)
+	userId := uint(floatUserId)
+	var user models.User
+	c.Db.First(&user, userId)
+
+	if len(user.Name) == 0 {
+		panic(404)
+	}
+
+	c.userId = userId
 	c.authorized = true
 
 	return nil
