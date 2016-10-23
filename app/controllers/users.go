@@ -8,28 +8,26 @@ import (
 	"github.com/revel/revel"
 )
 
-// TODO: Add jsend
-
 type Users struct {
 	BaseController
 }
 
 func (c Users) List() revel.Result {
 	var users []models.User
-	c.Txn.Find(&users)
-	return c.RenderJson(users)
+	c.Db.Find(&users)
+	return c.RenderJsend("success", users)
 }
 
-func (c Users) Item(id int64) revel.Result {
+func (c Users) Item(id uint) revel.Result {
 	var user models.User
-	c.Txn.First(&user, id)
+	c.Db.First(&user, id)
 	return c.RenderJsend("success", user)
 }
 
 func (c Users) Add(username string, password string) revel.Result {
 	var user = models.User{Name: username, Password: utils.HashPassword(password)}
-	c.Txn.NewRecord(user)
-	c.Txn.Create(&user)
-	var location = utils.Location{Location: routes.Users.Item(int64(user.ID))}
+	c.Db.NewRecord(user)
+	c.Db.Create(&user)
+	var location = utils.Location{Location: routes.Users.Item(user.ID)}
 	return c.RenderJsend("success", location)
 }

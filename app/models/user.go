@@ -10,6 +10,6 @@ type Base struct {
 
 type User struct { // example user fields
 	Name     string
-	Password []byte
+	Password []byte `json:"-"`
 	Base
 }

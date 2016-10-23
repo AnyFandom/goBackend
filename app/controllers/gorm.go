@@ -11,10 +11,10 @@ import (
 )
 
 // type: revel controller with `*gorm.DB`
-// c.Txn will keep `Gdb *gorm.DB`
+// c.Db will keep `Gdb *gorm.DB`
 type BaseController struct {
 	*r.Controller
-	Txn *gorm.DB
+	Db *gorm.DB
 }
 
 type Jsend struct {
@@ -47,38 +47,38 @@ func InitDB() {
 
 // transactions
 
-// This method fills the c.Txn before each transaction
+// This method fills the c.Db before each transaction
 func (c *BaseController) Begin() r.Result {
-	txn := Gdb.Begin()
-	if txn.Error != nil {
-		panic(txn.Error)
+	Db := Gdb.Begin()
+	if Db.Error != nil {
+		panic(Db.Error)
 	}
-	c.Txn = txn
+	c.Db = Db
 	return nil
 }
 
-// This method clears the c.Txn after each transaction
+// This method clears the c.Db after each transaction
 func (c *BaseController) Commit() r.Result {
-	if c.Txn == nil {
+	if c.Db == nil {
 		return nil
 	}
-	c.Txn.Commit()
-	if err := c.Txn.Error; err != nil && err != sql.ErrTxDone {
+	c.Db.Commit()
+	if err := c.Db.Error; err != nil && err != sql.ErrTxDone {
 		panic(err)
 	}
-	c.Txn = nil
+	c.Db = nil
 	return nil
 }
 
-// This method clears the c.Txn after each transaction, too
+// This method clears the c.Db after each transaction, too
 func (c *BaseController) Rollback() r.Result {
-	if c.Txn == nil {
+	if c.Db == nil {
 		return nil
 	}
-	c.Txn.Rollback()
-	if err := c.Txn.Error; err != nil && err != sql.ErrTxDone {
+	c.Db.Rollback()
+	if err := c.Db.Error; err != nil && err != sql.ErrTxDone {
 		panic(err)
 	}
-	c.Txn = nil
+	c.Db = nil
 	return nil
 }
