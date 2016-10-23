@@ -37,7 +37,7 @@ func (c Users) Add(username string, password string) revel.Result {
 		return c.RenderJsend("fail", nil, "Validation error")
 	}
 
-	var user = models.User{Name: username, Password: utils.HashPassword(password)}
+	var user = models.User{Username: username, Password: utils.HashPassword(password)}
 	c.Db.NewRecord(user)
 	c.Db.Create(&user)
 	var location = utils.Location{Location: routes.Users.Item(user.ID)}

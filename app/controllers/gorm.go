@@ -53,7 +53,7 @@ func (c *BaseController) CheckToken() r.Result {
 	var user models.User
 	c.Db.First(&user, userId)
 
-	if len(user.Name) == 0 {
+	if len(user.Username) == 0 {
 		panic(404)
 	}
 
