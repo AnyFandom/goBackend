@@ -16,6 +16,10 @@ GET     /users                                  Users.List
 GET     /users/add                              Users.Add
 GET     /users/:id                              Users.Item
 
+GET     /posts                                  Posts.List
+GET     /posts/add                              Posts.Add
+GET     /posts/:id                              Posts.Item
+
 GET     /token                                  Token.Create
 GET     /token/test                             Token.Test
 

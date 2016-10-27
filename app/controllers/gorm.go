@@ -4,7 +4,7 @@ import (
 	"reflect"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	// short name for revel
 	r "github.com/revel/revel"
 	// YOUR APP NAME
@@ -70,12 +70,13 @@ var Gdb *gorm.DB
 func InitDB() {
 	var err error
 	// open db
-	Gdb, err = gorm.Open("sqlite3", "test.db")
+	Gdb, err = gorm.Open("postgres", "host=localhost user=revel dbname=revel sslmode=disable password=revel")
 	if err != nil {
 		r.ERROR.Println("FATAL", err)
 		panic(err)
 	}
-	Gdb.AutoMigrate(&models.User{})
+	Gdb.AutoMigrate(&models.User{}, &models.Post{})
+	Gdb.LogMode(true)
 	// uniquie index if need
 	//Gdb.Model(&models.User{}).AddUniqueIndex("idx_user_name", "name")
 }
