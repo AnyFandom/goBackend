@@ -54,3 +54,27 @@ func (c Users) Current() revel.Result {
 	c.Db.First(&user, c.userId)
 	return c.RenderJsend("success", user, "")
 }
+
+func (c Users) ItemPosts(id uint) revel.Result {
+	var user models.User
+	c.Db.First(&user, id)
+	if user.ID == 0 {
+		return c.RenderJsend("fail", nil, "User not found")
+	}
+
+	var posts []models.Post
+	c.Db.Where(&models.Post{UserID: id}).Find(&posts)
+	return c.RenderJsend("success", posts, "")
+}
+
+func (c Users) CurrentPosts() revel.Result {
+	var user models.User
+	c.Db.First(&user, c.userId)
+	if user.ID == 0 {
+		return c.RenderJsend("fail", nil, "User not found")
+	}
+
+	var posts []models.Post
+	c.Db.Where(&models.Post{UserID: c.userId}).Find(&posts)
+	return c.RenderJsend("success", posts, "")
+}

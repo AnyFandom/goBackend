@@ -15,7 +15,9 @@ GET     /public/*filepath                       Static.Serve("public")
 GET     /users                                  Users.List
 GET     /users/add                              Users.Add
 GET     /users/current                          Users.Current
+GET     /users/current/posts                    Users.CurrentPosts
 GET     /users/:id                              Users.Item
+GET     /users/:id/posts                        Users.ItemPosts
 
 GET     /posts                                  Posts.List
 GET     /posts/add                              Posts.Add
