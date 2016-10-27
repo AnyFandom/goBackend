@@ -75,7 +75,7 @@ func InitDB() {
 		r.ERROR.Println("FATAL", err)
 		panic(err)
 	}
-	Gdb.AutoMigrate(&models.User{}, &models.Post{})
+	Gdb.AutoMigrate(&models.User{}, &models.Post{}, &models.Comment{})
 	Gdb.LogMode(true)
 	// uniquie index if need
 	//Gdb.Model(&models.User{}).AddUniqueIndex("idx_user_name", "name")

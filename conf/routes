@@ -23,6 +23,10 @@ GET     /posts                                  Posts.List
 GET     /posts/add                              Posts.Add
 GET     /posts/:id                              Posts.Item
 
+GET     /comments                               Comments.List
+GET     /comments/add                           Comments.Add
+GET     /comments/:id                           Comments.Item
+
 GET     /token                                  Token.Create
 GET     /token/test                             Token.Test
 
