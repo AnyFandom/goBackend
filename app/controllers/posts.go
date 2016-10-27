@@ -54,3 +54,15 @@ func (c Posts) Add(title string, content string) revel.Result {
 
 	return c.RenderJsend("success", location, "")
 }
+
+func (c Posts) ItemComments(id uint) revel.Result {
+	var post models.Post
+	c.Db.First(&post, id)
+	if post.ID == 0 {
+		return c.RenderJsend("fail", nil, "Not found")
+	}
+
+	var comments []models.Comment
+	c.Db.Where(&models.Comment{PostID: id}).Find(&comments)
+	return c.RenderJsend("success", comments, "")
+}

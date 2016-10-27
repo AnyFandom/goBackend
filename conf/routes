@@ -16,12 +16,15 @@ GET     /users                                  Users.List
 GET     /users/add                              Users.Add
 GET     /users/current                          Users.Current
 GET     /users/current/posts                    Users.CurrentPosts
+GET     /users/current/comments                 Users.CurrentComments
 GET     /users/:id                              Users.Item
 GET     /users/:id/posts                        Users.ItemPosts
+GET     /users/:id/comments                     Users.ItemComments
 
 GET     /posts                                  Posts.List
 GET     /posts/add                              Posts.Add
 GET     /posts/:id                              Posts.Item
+GET     /posts/:id/comments                     Posts.ItemComments
 
 GET     /comments                               Comments.List
 GET     /comments/add                           Comments.Add

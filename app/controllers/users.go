@@ -22,10 +22,18 @@ func (c Users) List() revel.Result {
 func (c Users) Item(id uint) revel.Result {
 	var user models.User
 	c.Db.First(&user, id)
+	if user.ID == 0 {
+		return c.RenderJsend("fail", nil, "Not found")
+	}
 	return c.RenderJsend("success", user, "")
 }
 
 func (c Users) Add(username string, password string) revel.Result {
+
+	if !c.authorized {
+		return c.RenderJsend("fail", nil, "Not authorized")
+	}
+
 	c.Validation.Required(username)
 	c.Validation.MaxSize(username, 15)
 	c.Validation.MinSize(username, 2)
@@ -77,4 +85,28 @@ func (c Users) CurrentPosts() revel.Result {
 	var posts []models.Post
 	c.Db.Where(&models.Post{UserID: c.userId}).Find(&posts)
 	return c.RenderJsend("success", posts, "")
+}
+
+func (c Users) ItemComments(id uint) revel.Result {
+	var user models.User
+	c.Db.First(&user, id)
+	if user.ID == 0 {
+		return c.RenderJsend("fail", nil, "User not found")
+	}
+
+	var comments []models.Comment
+	c.Db.Where(&models.Comment{UserID: id}).Find(&comments)
+	return c.RenderJsend("success", comments, "")
+}
+
+func (c Users) CurrentComments() revel.Result {
+	var user models.User
+	c.Db.First(&user, c.userId)
+	if user.ID == 0 {
+		return c.RenderJsend("fail", nil, "User not found")
+	}
+
+	var comments []models.Comment
+	c.Db.Where(&models.Comment{UserID: c.userId}).Find(&comments)
+	return c.RenderJsend("success", comments, "")
 }
