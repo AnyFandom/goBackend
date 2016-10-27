@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"goBackend/app/models"
 	"goBackend/app/routes"
 	"goBackend/app/utils"
@@ -42,4 +43,14 @@ func (c Users) Add(username string, password string) revel.Result {
 	c.Db.Create(&user)
 	var location = utils.Location{Location: routes.Users.Item(user.ID)}
 	return c.RenderJsend("success", location, "")
+}
+
+func (c Users) Current() revel.Result {
+	if !c.authorized {
+		return c.RenderJsend("fail", nil, "Not authorized")
+	}
+	fmt.Println(c.authorized, c.userId)
+	var user models.User
+	c.Db.First(&user, c.userId)
+	return c.RenderJsend("success", user, "")
 }
