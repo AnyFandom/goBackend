@@ -33,5 +33,16 @@ GET     /comments/:id                           Comments.Item
 GET     /token                                  Token.Create
 GET     /token/test                             Token.Test
 
+GET     /fandoms                                Fandoms.List
+GET     /fandoms/add                            Fandoms.Add
+GET     /fandoms/:id                            Fandoms.Item
+GET     /fandoms/:id/posts                      Fandoms.ItemPosts
+GET     /fandoms/:id/blogs                      Fandoms.ItemBlogs
+
+GET     /blogs                                  Blogs.List
+GET     /blogs/add                              Blogs.Add
+GET     /blogs/:id                              Blogs.Item
+GET     /blogs/:id/posts                        Blogs.ItemPosts
+
 # Catch all
 *       /:controller/:action                    :controller.:action

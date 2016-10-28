@@ -16,7 +16,7 @@ func (c Comments) List() revel.Result {
 	return c.RenderJsend("success", comments, "")
 }
 
-func (c Comments) Add(content string, postId uint) revel.Result {
+func (c Comments) Add(content string, postId uint, parentId uint) revel.Result {
 	if !c.authorized {
 		return c.RenderJsend("error", nil, "Not authorized")
 	}
@@ -29,7 +29,20 @@ func (c Comments) Add(content string, postId uint) revel.Result {
 		return c.RenderJsend("fail", nil, "Validation error")
 	}
 
-	comment := models.Comment{Content: content, PostID: postId, UserID: c.userId}
+	var post models.Post
+	c.Db.First(&post, postId)
+	if post.ID == 0 {
+		return c.RenderJsend("fail", nil, "Post not found")
+	}
+
+	var parent models.Comment
+	c.Db.First(&parent, parentId)
+
+	if parent.ID != 0 && parent.PostID != post.ID {
+		return c.RenderJsend("fail", nil, "Parent in other post")
+	}
+
+	comment := models.Comment{Content: content, PostID: postId, UserID: c.userId, ParentID: parent.ID, Depth: parent.Depth + 1}
 	c.Db.NewRecord(comment)
 	c.Db.Create(&comment)
 	return c.RenderJsend("success", comment, "")

@@ -30,10 +30,6 @@ func (c Users) Item(id uint) revel.Result {
 
 func (c Users) Add(username string, password string) revel.Result {
 
-	if !c.authorized {
-		return c.RenderJsend("fail", nil, "Not authorized")
-	}
-
 	c.Validation.Required(username)
 	c.Validation.MaxSize(username, 15)
 	c.Validation.MinSize(username, 2)

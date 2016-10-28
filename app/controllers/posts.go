@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"goBackend/app/models"
 	"goBackend/app/routes"
 	"goBackend/app/utils"
@@ -25,7 +24,7 @@ func (c Posts) Item(id uint) revel.Result {
 	return c.RenderJsend("success", post, "")
 }
 
-func (c Posts) Add(title string, content string) revel.Result {
+func (c Posts) Add(title string, content string, blogId uint) revel.Result {
 	if !c.authorized {
 		return c.RenderJsend("fail", nil, "Not authorized")
 	}
@@ -42,11 +41,17 @@ func (c Posts) Add(title string, content string) revel.Result {
 		return c.RenderJsend("fail", nil, "Validation error")
 	}
 
+	var blog models.Blog
+	c.Db.First(&blog, blogId)
+	if blog.ID == 0 {
+		return c.RenderJsend("fail", nil, "Blog not found")
+	}
+
 	var user models.User
 	c.Db.First(&user, c.userId)
 
-	var post = models.Post{Title: title, Content: content, UserID: user.ID}
-	fmt.Println(post)
+	var post = models.Post{Title: title, Content: content, UserID: user.ID, BlogID: blog.ID}
+
 	c.Db.NewRecord(post)
 	c.Db.Create(&post)
 
