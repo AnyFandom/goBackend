@@ -71,3 +71,46 @@ func (c Posts) ItemComments(id uint) revel.Result {
 	c.Db.Where(&models.Comment{PostID: id}).Find(&comments)
 	return c.RenderJsend("success", comments, "")
 }
+
+func (c Posts) ItemUpdate(id uint, title string, content string, avatar string) revel.Result {
+	var post models.Post
+	c.Db.First(&post, id)
+	if post.ID == 0 {
+		return c.RenderJsend("fail", nil, "Post not found")
+	}
+	if len(title) > 0 {
+		c.Validation.Required(title)
+		c.Validation.MaxSize(title, 100)
+		c.Validation.MinSize(title, 2)
+
+		if c.Validation.HasErrors() {
+			return c.RenderJsend("fail", nil, "Validation error")
+		}
+
+		post.Title = title
+	}
+	if len(content) > 0 {
+		c.Validation.Required(content)
+		c.Validation.MaxSize(content, 100)
+		c.Validation.MinSize(content, 2)
+
+		if c.Validation.HasErrors() {
+			return c.RenderJsend("fail", nil, "Validation error")
+		}
+
+		post.Content = content
+	}
+	c.Db.Save(&post)
+	return c.RenderJsend("success", nil, "")
+}
+
+// TODO: Проверка авторизации
+func (c Posts) ItemDelete(id uint) revel.Result {
+	var post models.Post
+	c.Db.First(&post, id)
+	if post.ID == 0 {
+		return c.RenderJsend("fail", nil, "Post not found")
+	}
+	c.Db.Debug().Delete(&post)
+	return c.RenderJsend("success", nil, "")
+}

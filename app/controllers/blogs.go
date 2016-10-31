@@ -69,3 +69,57 @@ func (c Blogs) ItemPosts(id uint) revel.Result {
 
 	return c.RenderJsend("success", posts, "")
 }
+
+func (c Blogs) ItemUpdate(id uint, title string, description string, avatar string) revel.Result {
+	var blog models.Blog
+	c.Db.First(&blog, id)
+	if blog.ID == 0 {
+		return c.RenderJsend("fail", nil, "Blog not found")
+	}
+	if len(title) > 0 {
+		c.Validation.Required(title)
+		c.Validation.MaxSize(title, 100)
+		c.Validation.MinSize(title, 2)
+
+		if c.Validation.HasErrors() {
+			return c.RenderJsend("fail", nil, "Validation error")
+		}
+
+		blog.Title = title
+	}
+	if len(description) > 0 {
+		c.Validation.Required(description)
+		c.Validation.MaxSize(description, 100)
+		c.Validation.MinSize(description, 2)
+
+		if c.Validation.HasErrors() {
+			return c.RenderJsend("fail", nil, "Validation error")
+		}
+
+		blog.Description = description
+	}
+	if len(avatar) > 0 {
+		c.Validation.Required(avatar)
+		c.Validation.MaxSize(avatar, 100)
+		c.Validation.MinSize(avatar, 2)
+
+		if c.Validation.HasErrors() {
+			return c.RenderJsend("fail", nil, "Validation error")
+		}
+
+		blog.Avatar = avatar
+	}
+	c.Db.Save(&blog)
+	return c.RenderJsend("success", nil, "")
+}
+
+// TODO: Проверка авторизации
+func (c Blogs) ItemDelete(id uint) revel.Result {
+	var blog models.Blog
+	c.Db.First(&blog, id)
+	if blog.ID == 0 {
+		return c.RenderJsend("fail", nil, "Blog not found")
+	}
+	c.Db.Debug().Delete(&blog)
+	return c.RenderJsend("success", nil, "")
+}

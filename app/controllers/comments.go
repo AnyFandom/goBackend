@@ -42,7 +42,15 @@ func (c Comments) Add(content string, postId uint, parentId uint) revel.Result {
 		return c.RenderJsend("fail", nil, "Parent in other post")
 	}
 
-	comment := models.Comment{Content: content, PostID: postId, UserID: c.userId, ParentID: parent.ID, Depth: parent.Depth + 1}
+	var depth int
+
+	if parent.ID == 0 {
+		depth = 0
+	} else {
+		depth = parent.Depth + 1
+	}
+
+	comment := models.Comment{Content: content, PostID: postId, UserID: c.userId, ParentID: parent.ID, Depth: depth}
 	c.Db.NewRecord(comment)
 	c.Db.Create(&comment)
 	return c.RenderJsend("success", comment, "")
@@ -55,4 +63,36 @@ func (c Comments) Item(id uint) revel.Result {
 		return c.RenderJsend("fail", nil, "Comment not found")
 	}
 	return c.RenderJsend("success", comment, "")
+}
+
+func (c Comments) ItemUpdate(id uint, content string) revel.Result {
+	var comment models.Comment
+	c.Db.First(&comment, id)
+	if comment.ID == 0 {
+		return c.RenderJsend("fail", nil, "Comment not found")
+	}
+	if len(content) > 0 {
+		c.Validation.Required(content)
+		c.Validation.MaxSize(content, 255)
+		c.Validation.MinSize(content, 2)
+
+		if c.Validation.HasErrors() {
+			return c.RenderJsend("fail", nil, "Validation error")
+		}
+
+		comment.Content = content
+	}
+	c.Db.Save(&comment)
+	return c.RenderJsend("success", nil, "")
+}
+
+// TODO: Проверка авторизации
+func (c Comments) ItemDelete(id uint) revel.Result {
+	var comment models.Comment
+	c.Db.First(&comment, id)
+	if comment.ID == 0 {
+		return c.RenderJsend("fail", nil, "Comment not found")
+	}
+	c.Db.Debug().Delete(&comment)
+	return c.RenderJsend("success", nil, "")
 }

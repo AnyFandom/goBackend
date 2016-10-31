@@ -5,6 +5,7 @@ import (
 	"goBackend/app/models"
 	"goBackend/app/routes"
 	"goBackend/app/utils"
+	"reflect"
 
 	"github.com/revel/revel"
 )
@@ -105,4 +106,55 @@ func (c Users) CurrentComments() revel.Result {
 	var comments []models.Comment
 	c.Db.Where(&models.Comment{UserID: c.userId}).Find(&comments)
 	return c.RenderJsend("success", comments, "")
+}
+
+func (c Users) ItemUpdate(id uint, username string, password string, password_old string) revel.Result {
+	var user models.User
+	c.Db.First(&user, id)
+	if user.ID == 0 {
+		return c.RenderJsend("fail", nil, "User not found")
+	}
+	if len(username) > 0 {
+		c.Validation.Required(username)
+		c.Validation.MaxSize(username, 100)
+		c.Validation.MinSize(username, 2)
+
+		if c.Validation.HasErrors() {
+			return c.RenderJsend("fail", nil, "Validation error")
+		}
+
+		user.Username = username
+	}
+
+	if len(password) > 0 {
+		c.Validation.Required(password)
+		c.Validation.MaxSize(password, 200)
+		c.Validation.MinSize(password, 6)
+
+		if c.Validation.HasErrors() {
+			return c.RenderJsend("fail", nil, "Validation error")
+		}
+
+		if len(password_old) == 0 {
+			return c.RenderJsend("fail", nil, "No old password")
+		}
+		if !reflect.DeepEqual(utils.HashPassword(password_old), user.Password) {
+			return c.RenderJsend("fail", nil, "Old password incorrect")
+		}
+
+		user.Password = utils.HashPassword(password)
+	}
+	c.Db.Save(&user)
+	return c.RenderJsend("success", nil, "")
+}
+
+// TODO: Проверка авторизации
+func (c Users) ItemDelete(id uint) revel.Result {
+	var user models.User
+	c.Db.First(&user, id)
+	if user.ID == 0 {
+		return c.RenderJsend("fail", nil, "User not found")
+	}
+	c.Db.Debug().Delete(&user)
+	return c.RenderJsend("success", nil, "")
 }

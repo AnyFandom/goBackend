@@ -78,3 +78,57 @@ func (c Fandoms) ItemBlogs(id uint) revel.Result {
 
 	return c.RenderJsend("success", blogs, "")
 }
+
+func (c Fandoms) ItemUpdate(id uint, title string, description string, avatar string) revel.Result {
+	var fandom models.Fandom
+	c.Db.First(&fandom, id)
+	if fandom.ID == 0 {
+		return c.RenderJsend("fail", nil, "Fandom not found")
+	}
+	if len(title) > 0 {
+		c.Validation.Required(title)
+		c.Validation.MaxSize(title, 100)
+		c.Validation.MinSize(title, 2)
+
+		if c.Validation.HasErrors() {
+			return c.RenderJsend("fail", nil, "Validation error")
+		}
+
+		fandom.Title = title
+	}
+	if len(description) > 0 {
+		c.Validation.Required(description)
+		c.Validation.MaxSize(description, 100)
+		c.Validation.MinSize(description, 2)
+
+		if c.Validation.HasErrors() {
+			return c.RenderJsend("fail", nil, "Validation error")
+		}
+
+		fandom.Description = description
+	}
+	if len(avatar) > 0 {
+		c.Validation.Required(avatar)
+		c.Validation.MaxSize(avatar, 100)
+		c.Validation.MinSize(avatar, 2)
+
+		if c.Validation.HasErrors() {
+			return c.RenderJsend("fail", nil, "Validation error")
+		}
+
+		fandom.Avatar = avatar
+	}
+	c.Db.Save(&fandom)
+	return c.RenderJsend("success", nil, "")
+}
+
+// TODO: Проверка авторизации
+func (c Fandoms) ItemDelete(id uint) revel.Result {
+	var fandom models.Fandom
+	c.Db.First(&fandom, id)
+	if fandom.ID == 0 {
+		return c.RenderJsend("fail", nil, "Fandom not found")
+	}
+	c.Db.Debug().Delete(&fandom)
+	return c.RenderJsend("success", nil, "")
+}

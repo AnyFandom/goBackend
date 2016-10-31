@@ -1,9 +1,9 @@
 package models
 
 type Blog struct {
-	Title       string
-	Description string
-	FandomID    uint
-	Avatar      string
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	FandomID    uint   `json:"fandom_id"`
+	Avatar      string `json:"avatar"`
 	Base
 }

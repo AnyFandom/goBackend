@@ -13,7 +13,7 @@ GET     /favicon.ico                            404
 GET     /public/*filepath                       Static.Serve("public")
 
 GET     /users                                  Users.List
-GET     /users/add                              Users.Add
+POST    /users                                  Users.Add
 GET     /users/current                          Users.Current
 GET     /users/current/posts                    Users.CurrentPosts
 GET     /users/current/comments                 Users.CurrentComments
@@ -22,25 +22,27 @@ GET     /users/:id/posts                        Users.ItemPosts
 GET     /users/:id/comments                     Users.ItemComments
 
 GET     /posts                                  Posts.List
-GET     /posts/add                              Posts.Add
+POST    /posts                                  Posts.Add
 GET     /posts/:id                              Posts.Item
 GET     /posts/:id/comments                     Posts.ItemComments
 
 GET     /comments                               Comments.List
-GET     /comments/add                           Comments.Add
+POST    /comments                               Comments.Add
 GET     /comments/:id                           Comments.Item
+DELETE  /comments/:id                           Comments.ItemDelete
+PATCH   /comments/:id                           Comments.ItemUpdate
 
-GET     /token                                  Token.Create
+POST    /token                                  Token.Create
 GET     /token/test                             Token.Test
 
 GET     /fandoms                                Fandoms.List
-GET     /fandoms/add                            Fandoms.Add
+POST    /fandoms                                Fandoms.Add
 GET     /fandoms/:id                            Fandoms.Item
 GET     /fandoms/:id/posts                      Fandoms.ItemPosts
 GET     /fandoms/:id/blogs                      Fandoms.ItemBlogs
 
 GET     /blogs                                  Blogs.List
-GET     /blogs/add                              Blogs.Add
+POST    /blogs                                  Blogs.Add
 GET     /blogs/:id                              Blogs.Item
 GET     /blogs/:id/posts                        Blogs.ItemPosts
 
