@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"goBackend/app/models"
+	"goBackend/app/utils"
 
 	"github.com/revel/revel"
 )
@@ -13,6 +14,9 @@ type Comments struct {
 func (c Comments) List() revel.Result {
 	var comments []models.Comment
 	c.Db.Find(&comments)
+	for _, v := range comments {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
 	return c.RenderJsend("success", comments, "")
 }
 
@@ -62,6 +66,9 @@ func (c Comments) Item(id uint) revel.Result {
 	if comment.ID == 0 {
 		return c.RenderJsend("fail", nil, "Comment not found")
 	}
+
+	c.include = utils.ExtendInclude(c.include, comment.LoadInclude(c.Db))
+
 	return c.RenderJsend("success", comment, "")
 }
 

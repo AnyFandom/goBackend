@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/sha256"
 	"fmt"
+	"reflect"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
@@ -47,4 +48,32 @@ func ParseToken(tokenString string) jwt.MapClaims {
 		panic(err)
 	}
 	return claims
+}
+
+type IncludeItem struct {
+	Type string      `json:"type"`
+	Data interface{} `json:"data"`
+}
+
+func contains(s []IncludeItem, e IncludeItem) bool {
+	for _, a := range s {
+		if reflect.DeepEqual(a, e) {
+			return true
+		}
+	}
+	return false
+}
+
+func AppendInclude(slice []IncludeItem, item IncludeItem) []IncludeItem {
+	if !contains(slice, item) {
+		slice = append(slice, item)
+	}
+	return slice
+}
+
+func ExtendInclude(slice []IncludeItem, items []IncludeItem) []IncludeItem {
+	for _, v := range items {
+		slice = AppendInclude(slice, v)
+	}
+	return slice
 }

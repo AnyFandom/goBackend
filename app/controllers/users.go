@@ -17,6 +17,9 @@ type Users struct {
 func (c Users) List() revel.Result {
 	var users []models.User
 	c.Db.Find(&users)
+	for _, v := range users {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
 	return c.RenderJsend("success", users, "")
 }
 
@@ -26,6 +29,7 @@ func (c Users) Item(id uint) revel.Result {
 	if user.ID == 0 {
 		return c.RenderJsend("fail", nil, "Not found")
 	}
+	c.include = utils.ExtendInclude(c.include, user.LoadInclude(c.Db))
 	return c.RenderJsend("success", user, "")
 }
 
@@ -57,6 +61,7 @@ func (c Users) Current() revel.Result {
 	fmt.Println(c.authorized, c.userId)
 	var user models.User
 	c.Db.First(&user, c.userId)
+	c.include = utils.ExtendInclude(c.include, user.LoadInclude(c.Db))
 	return c.RenderJsend("success", user, "")
 }
 
@@ -69,6 +74,9 @@ func (c Users) ItemPosts(id uint) revel.Result {
 
 	var posts []models.Post
 	c.Db.Where(&models.Post{UserID: id}).Find(&posts)
+	for _, v := range posts {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
 	return c.RenderJsend("success", posts, "")
 }
 
@@ -81,6 +89,9 @@ func (c Users) CurrentPosts() revel.Result {
 
 	var posts []models.Post
 	c.Db.Where(&models.Post{UserID: c.userId}).Find(&posts)
+	for _, v := range posts {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
 	return c.RenderJsend("success", posts, "")
 }
 
@@ -93,6 +104,9 @@ func (c Users) ItemComments(id uint) revel.Result {
 
 	var comments []models.Comment
 	c.Db.Where(&models.Comment{UserID: id}).Find(&comments)
+	for _, v := range comments {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
 	return c.RenderJsend("success", comments, "")
 }
 
@@ -105,6 +119,9 @@ func (c Users) CurrentComments() revel.Result {
 
 	var comments []models.Comment
 	c.Db.Where(&models.Comment{UserID: c.userId}).Find(&comments)
+	for _, v := range comments {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
 	return c.RenderJsend("success", comments, "")
 }
 

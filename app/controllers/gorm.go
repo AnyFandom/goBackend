@@ -20,17 +20,42 @@ type BaseController struct {
 	Db         *gorm.DB
 	authorized bool
 	userId     uint
+	include    []utils.IncludeItem
 }
 
 type Jsend struct {
-	Status  string      `json:"status"`
-	Data    interface{} `json:"data"`
-	Message string      `json:"message"`
+	Status  string              `json:"status"`
+	Data    interface{}         `json:"data"`
+	Message string              `json:"message"`
+	Include []utils.IncludeItem `json:"include"`
+}
+
+func contains(s []utils.IncludeItem, e utils.IncludeItem) bool {
+	for _, a := range s {
+		if reflect.DeepEqual(a, e) {
+			return true
+		}
+	}
+	return false
 }
 
 func (c BaseController) RenderJsend(s string, d interface{}, m string) r.Result {
-	jsend := Jsend{Status: s, Data: d, Message: m}
+	jsend := Jsend{Status: s, Data: d, Message: m, Include: c.include}
 	return c.RenderJson(jsend)
+}
+
+func (c *BaseController) AddInclude(include_type string, item interface{}) {
+	incl := utils.IncludeItem{Type: include_type, Data: item}
+	if contains(c.include, incl) {
+		return
+	}
+	c.include = append(c.include, incl)
+}
+
+func (c *BaseController) ExtendInclude(ext []utils.IncludeItem) {
+	for _, v := range ext {
+		c.AddInclude(v.Type, v.Data)
+	}
 }
 
 func (c *BaseController) CheckToken() r.Result {

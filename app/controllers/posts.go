@@ -15,12 +15,18 @@ type Posts struct {
 func (c Posts) List() revel.Result {
 	var posts []models.Post
 	c.Db.Find(&posts)
+	for _, v := range posts {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
 	return c.RenderJsend("success", posts, "")
 }
 
 func (c Posts) Item(id uint) revel.Result {
 	var post models.Post
 	c.Db.First(&post, id)
+
+	c.include = utils.ExtendInclude(c.include, post.LoadInclude(c.Db))
+
 	return c.RenderJsend("success", post, "")
 }
 
@@ -69,6 +75,9 @@ func (c Posts) ItemComments(id uint) revel.Result {
 
 	var comments []models.Comment
 	c.Db.Where(&models.Comment{PostID: id}).Find(&comments)
+	for _, v := range comments {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
 	return c.RenderJsend("success", comments, "")
 }
 

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"goBackend/app/models"
+	"goBackend/app/utils"
 
 	"github.com/revel/revel"
 )
@@ -13,6 +14,9 @@ type Fandoms struct {
 func (c Fandoms) List() revel.Result {
 	var fandoms []models.Fandom
 	c.Db.Find(&fandoms)
+	for _, v := range fandoms {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
 	return c.RenderJsend("success", fandoms, "")
 }
 
@@ -61,6 +65,10 @@ func (c Fandoms) ItemPosts(id uint) revel.Result {
 
 	c.Db.Raw("SELECT * FROM posts WHERE blog_id in (SELECT id FROM blogs WHERE fandom_id = ?);", fandom.ID).Scan(&posts)
 
+	for _, v := range posts {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
+
 	return c.RenderJsend("success", posts, "")
 }
 
@@ -75,6 +83,10 @@ func (c Fandoms) ItemBlogs(id uint) revel.Result {
 	}
 
 	c.Db.Where("fandom_id = ?", fandom.ID).Find(&blogs)
+
+	for _, v := range blogs {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
 
 	return c.RenderJsend("success", blogs, "")
 }

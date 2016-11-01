@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"goBackend/app/models"
+	"goBackend/app/utils"
 
 	"github.com/revel/revel"
 )
@@ -13,6 +14,9 @@ type Blogs struct {
 func (c Blogs) List() revel.Result {
 	var blogs []models.Blog
 	c.Db.Find(&blogs)
+	for _, v := range blogs {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
 	return c.RenderJsend("success", blogs, "")
 }
 
@@ -52,6 +56,9 @@ func (c Blogs) Item(id uint) revel.Result {
 		return c.RenderJsend("fail", nil, "Not found")
 	}
 
+	c.include = utils.ExtendInclude(c.include, blog.LoadInclude(c.Db))
+
+	c.ExtendInclude(blog.LoadInclude(c.Db))
 	return c.RenderJsend("success", blog, "")
 }
 
@@ -66,6 +73,10 @@ func (c Blogs) ItemPosts(id uint) revel.Result {
 	}
 
 	c.Db.Where("blog_id = ?", blog.ID).Find(&posts)
+
+	for _, v := range posts {
+		c.include = utils.ExtendInclude(c.include, v.LoadInclude(c.Db))
+	}
 
 	return c.RenderJsend("success", posts, "")
 }
